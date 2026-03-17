@@ -2,9 +2,6 @@
 export function qs(selector, parent = document) {
   return parent.querySelector(selector);
 }
-// or a more concise version if you are into that sort of thing:
-// export const qs = (selector, parent = document) => parent.querySelector(selector);
-
 // retrieve data from localstorage
 export function getLocalStorage(key) {
   return JSON.parse(localStorage.getItem(key));
@@ -33,6 +30,36 @@ export function renderListWithTemplate(
 
   const htmlStrings = list.map(templateFn);
   parentElement.insertAdjacentHTML(position, htmlStrings.join(""));
+}
+
+// load an HTML partial
+export async function loadTemplate(path) {
+  const response = await fetch(path);
+  return await response.text();
+}
+export function renderWithTemplate(template, parentElement, data, callback) {
+  parentElement.innerHTML = template;
+
+  if (callback) {
+    callback(data);
+  }
+}
+// load header and footer partials into the page
+export async function loadHeaderFooter() {
+  const header = await loadTemplate("/partials/header.html");
+  const footer = await loadTemplate("/partials/footer.html");
+
+  const headerElement = qs("#main-header");
+  const footerElement = qs("#main-footer");
+
+  if (headerElement) {
+    renderWithTemplate(header, headerElement);
+    headerElement.classList.add("divider");
+  }
+
+  if (footerElement) {
+    renderWithTemplate(footer, footerElement);
+  }
 }
 // set a listener for both touchend and click
 export function setClick(selector, callback) {
